@@ -170,26 +170,29 @@ class ProjectDeploymentHandler
   def configure_database_yml
     file = <<-EOF
       production:
-        adapter: mysql2 # <--- Notice we are using the MySQL 2 gem.
-        encoding: utf8
-        reconnect: false
+        adapter: mysql
         database: #{guid}_production
         pool: 5
         username: gitpusshuten
         password: #{guid}
         host: localhost
     EOF
+    FileUtils.mkdir_p(File.join(deploy_dir, '.gitpusshuten', 'active_record'))
     File.open(File.join(deploy_dir, '.gitpusshuten', 'active_record', 'production.database.yml'), 'w') do |f|
       f << file
     end
 
     sleep 1
-    Open3.popen3("heavenly active_record upload-configuration to production")
+    Open3.popen3("heavenly active_record upload-configuration to production") do |stdin, stdout, stderr|
+      puts stdout.read
+    end
   end
 
   def push_master
     sleep 1
-    Open3.popen3("heavenly push branch master to production")
+    Open3.popen3("heavenly push branch master to production") do |stdin, stdout, stderr|
+      puts stdout.read
+    end
   end
 
   def modify_nginx_vhost
@@ -209,6 +212,8 @@ class ProjectDeploymentHandler
 
   def upload_nginx_vhost
     sleep 1
-    Open3.popen3("heavenly nginx upload-vhost to production")
+    Open3.popen3("heavenly nginx upload-vhost to production") do |sdtdin, stdout, stderr|
+      puts stdout.read
+    end
   end
 end
