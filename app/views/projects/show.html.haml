@@ -1,0 +1,6 @@
+%h2= project
+
+%p= "Git repo: #{project.git_repo}"
+
+%ul.actions
+  %li= link_to("Launch me a #{project}", new_project_deploy_path(project))

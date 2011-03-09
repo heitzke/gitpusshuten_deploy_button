@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  server_ip: MyString
+  root_password: MyString
+  domain_name: MyString
+  project_id: 1
+  guid: MyString
+
+two:
+  server_ip: MyString
+  root_password: MyString
+  domain_name: MyString
+  project_id: 1
+  guid: MyString

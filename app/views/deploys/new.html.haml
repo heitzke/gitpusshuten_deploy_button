@@ -1,0 +1,14 @@
+%h2= "Launch a new #{project} instance"
+
+= form_for [project, deploy] do |f|
+  %fieldset
+    %legend Server Details
+    = f.label :guid
+    = f.text_field :guid
+    = f.label :server_ip
+    = f.text_field :server_ip
+    = f.label :root_password
+    = f.text_field :root_password
+    = f.label :domain_name
+    = f.text_field :domain_name
+    = f.submit

@@ -1,45 +1,33 @@
 class ProjectDeploymentHandler
-  attr_accessor :guid, :git_repo, :server_ip, :root_password, :domain
+  attr_accessor :guid, :git_repo, :server_ip, :root_password, :domain, :logger
 
-  def initialize(guid, git_repo, server_ip, root_password, domain='www.example.com')
+  def initialize(guid, git_repo, server_ip, root_password, domain='www.example.com', logger=Rails.logger)
     @guid = guid
     @git_repo = git_repo
     @server_ip = server_ip
     @root_password = root_password
     @domain = domain
+    @logger = logger
   end
 
   # For now this will just use CLI commands I think...longer-term it would actually use the gitpusshuten classes directly
   # Each of these methods wraps a CLI command
   def handle_deployment
-    puts "1"
     clone_git_repo
-    puts "2"
     cd_into_deploy_dir
-    puts "3"
     initialize_gitpusshuten
-    puts "4"
     configure_gitpusshuten
-    puts "5"
     install_root_ssh_key
-    puts "6"
     install_rvm
-    puts "7"
     install_passenger
-    puts "8"
     add_user
-    puts "9"
     install_mysql
-    puts "1"
     add_mysql_user
-    puts "2"
     configure_database_yml
-    puts "3"
     push_master
-    puts "4"
     modify_nginx_vhost
-    puts "5"
     upload_nginx_vhost
+    log "\n== Finished!  You can now visit #{domain} ==\n"
   end
 
   def base_dir
@@ -51,26 +39,34 @@ class ProjectDeploymentHandler
   end
 
   def clone_git_repo
+    log "\n== cloning git repo: #{git_repo} ==\n"
     Open3.popen3("git clone #{git_repo} #{deploy_dir}") do |stdin, stdout, stderr|
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def cd_into_deploy_dir
+    log "\n== cd into deploy dir ==\n"
     sleep 1
     FileUtils.cd(deploy_dir)
   end
 
+  def log(message)
+    logger.log message
+  end
+
   def initialize_gitpusshuten
+    log "\n== initialize gitpusshuten ==\n"
     sleep 1
     Open3.popen3("heavenly initialize") do |stdin, stdout, stderr|
       stdin.puts '1'
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def configure_gitpusshuten
+    log "\n== configure gitpusshuten ==\n"
     sleep 1
     file = <<-EOF
       pusshuten '#{guid}', :production do
@@ -98,6 +94,7 @@ class ProjectDeploymentHandler
   end
 
   def install_root_ssh_key
+    log "\n== install root ssh key ==\n"
     sleep 1
     begin
       Open3.popen3("heavenly user install-root-ssh-key to production") do |stdin, stdout, stderr|
@@ -105,56 +102,61 @@ class ProjectDeploymentHandler
         stdin.close_write
       end
     rescue
-      puts 'rescued...'
+      log 'rescued...'
     end
     Open3.popen3("heavenly user install-root-ssh-key to production") do |stdin, stdout, stderr|
       stdin.puts root_password
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def install_rvm
+    log "\n== install rvm ==\n"
     sleep 1
     Open3.popen3("heavenly rvm install to production") do |stdin, stdout, stderr|
       stdin.puts '4' # 1.9.2
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def install_passenger
+    log "\n== install passenger ==\n"
     sleep 1
     Open3.popen3("heavenly passenger install to production") do |stdin, stdout, stderr|
       stdin.puts '1' #Nginx
       stdin.flush
       stdin.puts '1' # Yeah, you can configure it that way
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def add_user
+    log "\n== add user ==\n"
     sleep 1
     Open3.popen3("heavenly user add to production") do |stdin, stdout, stderr|
       stdin.puts '1'
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def install_mysql
+    log "\n== install mysql ==\n"
     sleep 1
     Open3.popen3("heavenly mysql install to production") do |stdin, stdout, stderr|
       stdin.puts root_password
       stdin.flush
       stdin.puts root_password
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def add_mysql_user
+    log "\n== add mysql user ==\n"
     sleep 1
     Open3.popen3("heavenly mysql add-user to production") do |stdin, stdout, stderr|
       stdin.puts root_password
@@ -163,11 +165,12 @@ class ProjectDeploymentHandler
       stdin.flush
       stdin.puts guid # mysql user's password is the guid
       stdin.close_write
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def configure_database_yml
+    log "\n== configure database ==\n"
     file = <<-EOF
       production:
         adapter: mysql
@@ -184,18 +187,20 @@ class ProjectDeploymentHandler
 
     sleep 1
     Open3.popen3("heavenly active_record upload-configuration to production") do |stdin, stdout, stderr|
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def push_master
+    log "\n== push master ==\n"
     sleep 1
     Open3.popen3("heavenly push branch master to production") do |stdin, stdout, stderr|
-      puts stdout.read
+      log stdout.read
     end
   end
 
   def modify_nginx_vhost
+    log "\n== modify nginx vhost ==\n"
     sleep 1
     file = <<-EOF
       server {
@@ -211,9 +216,10 @@ class ProjectDeploymentHandler
   end
 
   def upload_nginx_vhost
+    log "\n== upload nginx vhost ==\n"
     sleep 1
     Open3.popen3("heavenly nginx upload-vhost to production") do |sdtdin, stdout, stderr|
-      puts stdout.read
+      log stdout.read
     end
   end
 end
