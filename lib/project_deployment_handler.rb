@@ -12,19 +12,33 @@ class ProjectDeploymentHandler
   # For now this will just use CLI commands I think...longer-term it would actually use the gitpusshuten classes directly
   # Each of these methods wraps a CLI command
   def handle_deployment
+    puts "1"
     clone_git_repo
+    puts "2"
     cd_into_deploy_dir
+    puts "3"
     initialize_gitpusshuten
+    puts "4"
     configure_gitpusshuten
+    puts "5"
     install_root_ssh_key
+    puts "6"
     install_rvm
+    puts "7"
     install_passenger
+    puts "8"
     add_user
+    puts "9"
     install_mysql
+    puts "1"
     add_mysql_user
+    puts "2"
     configure_database_yml
+    puts "3"
     push_master
+    puts "4"
     modify_nginx_vhost
+    puts "5"
     upload_nginx_vhost
   end
 
@@ -33,22 +47,29 @@ class ProjectDeploymentHandler
   end
 
   def deploy_dir
-    "/#{base_dir}/#{guid}"
+    "#{base_dir}/#{guid}"
   end
 
   def clone_git_repo
-    `git clone #{git_repo} #{deploy_dir}`
+    Open3.popen3("git clone #{git_repo} #{deploy_dir}")
   end
 
   def cd_into_deploy_dir
-    `cd #{deploy_dir}`
+    sleep 1
+    FileUtils.cd(deploy_dir)
   end
 
   def initialize_gitpusshuten
-    `heavenly initialize`
+    sleep 1
+    Open3.popen3("heavenly initialize") do |stdin, stdout, stderr|
+      stdin.puts '1'
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def configure_gitpusshuten
+    sleep 1
     file = <<-EOF
       pusshuten '#{guid}', :production do
         configure do |c|
@@ -74,27 +95,51 @@ class ProjectDeploymentHandler
   end
 
   def install_root_ssh_key
-    `heavenly user install-root-ssh-key to production`
+    sleep 1
+    begin
+      Open3.popen3("heavenly user install-root-ssh-key to production") do |stdin, stdout, stderr|
+        stdin.puts 'yes'
+        stdin.close_write
+      end
+    rescue
+      puts 'rescued...'
+    end
+    Open3.popen3("heavenly user install-root-ssh-key to production") do |stdin, stdout, stderr|
+      stdin.puts root_password
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def install_rvm
-    `heavenly rvm install to production`
+    Open3.popen3("heavenly rvm install to production") do |stdin, stdout, stderr|
+      stdin.puts '4' # 1.9.2
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def install_passenger
-    `heavenly passenger install to production`
+    Open3.popen3("heavenly passenger install to production") do |stdin, stdout, stderr|
+      stdin.puts '1' #Nginx
+      stdin.flush
+      puts stdout.read
+      stdin.puts '1' # Yeah, you can configure it that way
+      stdin.flush
+      puts stdout.read
+    end
   end
 
   def add_user
-    `heavenly user add to production`
+    Open3.popen3("heavenly user add to production")
   end
 
   def install_mysql
-    `heavenly mysql install to production`
+    Open3.popen3("heavenly mysql install to production")
   end
 
   def add_mysql_user
-    `heavenly mysql add-user to production`
+    Open3.popen3("heavenly mysql add-user to production")
   end
 
   def configure_database_yml
@@ -112,7 +157,7 @@ class ProjectDeploymentHandler
   end
 
   def push_master
-    `heavenly push branch master to production`
+    Open3.popen3("heavenly push branch master to production")
   end
 
   def modify_nginx_vhost
@@ -127,6 +172,6 @@ class ProjectDeploymentHandler
   end
 
   def upload_nginx_vhost
-    `heavenly nginx upload-vhost to production`
+    Open3.popen3("heavenly nginx upload-vhost to production")
   end
 end
