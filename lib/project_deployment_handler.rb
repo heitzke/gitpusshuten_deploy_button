@@ -51,7 +51,9 @@ class ProjectDeploymentHandler
   end
 
   def clone_git_repo
-    Open3.popen3("git clone #{git_repo} #{deploy_dir}")
+    Open3.popen3("git clone #{git_repo} #{deploy_dir}") do |stdin, stdout, stderr|
+      puts stdout.read
+    end
   end
 
   def cd_into_deploy_dir
@@ -74,6 +76,7 @@ class ProjectDeploymentHandler
       pusshuten '#{guid}', :production do
         configure do |c|
           c.user   = 'gitpusshuten'
+          c.password = '#{guid}'
           c.ip     = '#{server_ip}'
           c.port   = '22'
           c.path   = '/var/applications/'
@@ -112,6 +115,7 @@ class ProjectDeploymentHandler
   end
 
   def install_rvm
+    sleep 1
     Open3.popen3("heavenly rvm install to production") do |stdin, stdout, stderr|
       stdin.puts '4' # 1.9.2
       stdin.close_write
@@ -120,26 +124,47 @@ class ProjectDeploymentHandler
   end
 
   def install_passenger
+    sleep 1
     Open3.popen3("heavenly passenger install to production") do |stdin, stdout, stderr|
       stdin.puts '1' #Nginx
       stdin.flush
-      puts stdout.read
       stdin.puts '1' # Yeah, you can configure it that way
-      stdin.flush
+      stdin.close_write
       puts stdout.read
     end
   end
 
   def add_user
-    Open3.popen3("heavenly user add to production")
+    sleep 1
+    Open3.popen3("heavenly user add to production") do |stdin, stdout, stderr|
+      stdin.puts '1'
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def install_mysql
-    Open3.popen3("heavenly mysql install to production")
+    sleep 1
+    Open3.popen3("heavenly mysql install to production") do |stdin, stdout, stderr|
+      stdin.puts root_password
+      stdin.flush
+      stdin.puts root_password
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def add_mysql_user
-    Open3.popen3("heavenly mysql add-user to production")
+    sleep 1
+    Open3.popen3("heavenly mysql add-user to production") do |stdin, stdout, stderr|
+      stdin.puts root_password
+      stdin.flush
+      stdin.puts guid # mysql user's password is the guid
+      stdin.flush
+      stdin.puts guid # mysql user's password is the guid
+      stdin.close_write
+      puts stdout.read
+    end
   end
 
   def configure_database_yml
@@ -154,24 +179,36 @@ class ProjectDeploymentHandler
         password: #{guid}
         host: localhost
     EOF
+    File.open(File.join(deploy_dir, '.gitpusshuten', 'active_record', 'production.database.yml'), 'w') do |f|
+      f << file
+    end
+
+    sleep 1
+    Open3.popen3("heavenly active_record upload-configuration to production")
   end
 
   def push_master
+    sleep 1
     Open3.popen3("heavenly push branch master to production")
   end
 
   def modify_nginx_vhost
+    sleep 1
     file = <<-EOF
       server {
         listen 80;
-        server_name #{domain}
+        server_name #{domain};
         root /var/applications/#{guid}.production/public;
         passenger_enabled on;
       }
     EOF
+    File.open(File.join(deploy_dir, '.gitpusshuten', 'nginx', 'production.vhost'), 'w') do |f|
+      f << file
+    end
   end
 
   def upload_nginx_vhost
+    sleep 1
     Open3.popen3("heavenly nginx upload-vhost to production")
   end
 end
