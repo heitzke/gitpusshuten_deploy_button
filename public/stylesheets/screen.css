@@ -1,5 +1,4 @@
 html {
-  height:100%;
   background:#0e0f10;
   background: linear-gradient(top, #212329, #0e0f10); 
   background: -moz-linear-gradient(top, #212329, #0e0f10);
@@ -10,6 +9,7 @@ html {
 body {
   background:url(../images/main_bg.png) repeat-x;
   min-height:387px;
+
 }
 
 #header_top {
@@ -83,6 +83,19 @@ body {
   font-size:1em;
 }
 
+.project_row {
+  width:940px;
+  margin: 5px 0 10px 0;
+}
+
+.project_row .project {
+  width:210px;
+  background:#6c7578;
+  height:100px;
+  float:left;
+  margin: 0 10px 10px 0;
+}
+
 #footer_bar {
   height:2px;
   background:#17191b;
@@ -106,4 +119,9 @@ body {
   height:200px;
   width:960px;
   margin: 0 auto;
+}
+
+.clear {
+  clear:both;
+
 }
