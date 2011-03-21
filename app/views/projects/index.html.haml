@@ -3,17 +3,50 @@
 .project_row
   .project
     .project_content
+      = image_tag "xrono_logo.png"
       %h3
-        Xrono
+        %a{:href => "1"}
+          Xrono
+      %p
+        Lorem ipsum dolro lorem pLorem ipsum dolro lorem Lorem ipsum dolro lorem lorem ipdum lorem ipdum lorem ipdum lorem ipdum lorem ipdum lorem ipdum lorem ipdum lorem ipdum 
+
   .project
     .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
   .project
+    .project_content
+      %h3
   .project
+    .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
+.clear
 .project_row
   .project
+    .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
+
   .project
+    .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
   .project
+    .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
   .project
+    .project_content
+      %h3
+        %a{:href => "2"}
+          Xrono Xrono
+.clear
 %ul
   - projects.each do |project|
     %li= link_to(project, project_path(project))

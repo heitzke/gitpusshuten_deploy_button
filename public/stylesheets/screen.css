@@ -2,7 +2,7 @@ html {
   font-family: 'helvetica', 'arial', 'georgia', sans-serif;
   height:100%;
   width:100%;
-  overflow:hidden;
+  overflow-x:hidden;
   background:#0e0f10;
 }
 
@@ -108,7 +108,7 @@ body {
 
 #content p {
   margin: 10px 0 10px 0;
-  font-size:1em;
+  font-size:.9em;
 }
 
 #content #sidebar {
@@ -130,6 +130,7 @@ body {
   background:url(../images/sidebar_bg.png) repeat-y;
   width:200px;
   padding: 0 0 0 17px;
+  font-size:.9em;
 }
 
 .sidebar_content ul {
@@ -153,7 +154,11 @@ body {
 #inner_content {
   float:left;
   margin: 0 0 0 220px;
+}
 
+#inner_content p {
+  color:#bbbbbb;
+  font-size:.8em;
 }
 
 .project_row {
@@ -164,7 +169,8 @@ body {
 .project_row .project {
   width:200px;
   background:#484c4f;
-  height:100px;
+  min-height:100px;
+  height:auto;
   float:left;
   padding: 5px;
   margin: 0 15px 10px 0;
@@ -174,7 +180,33 @@ body {
   background:url(../images/project_bg.png) no-repeat;
   background-color:#737a7e;
   width:200px;
-  height:100px;
+  min-height:100px;
+  height:auto;
+  padding: 10px 0 10px 0; 
+}
+
+.project_content h3 {
+}
+
+.project_content h3 a {
+  font-size:1.2em;
+  color:#27252c;
+  text-decoration:none;
+  margin: 10px 0 0 10px;
+}
+#content .project_content p {
+  font-size:.8em;
+  margin: 10px 0 0 10px;
+}
+
+
+.project_content h3 a:hover {
+  text-decoration:underline;
+}
+
+.project_content img {
+  float:left;
+  margin: 10px 10px 0 10px;
 }
 
 #footer_bar {
