@@ -1,6 +1,37 @@
-%h2= project
+%h2 
+  Project
+#sidebar
+  .sidebar_cap
+  .sidebar_content
+    %ul
+      %li 
+        Released Feb. 10
+      %li 
+        Released Feb. 10
+      %li 
+        Size: 1.6MB
+      %li 
+        Seller: Isotope11
+      %li
+        Requirements:
+  .sidebar_bottom
+#inner_content
+  %p
+    Lorem ipsum dolor p  Lorem ipsum dolor   Lorem ipsum dolor   Lorem ipsum dolor
+  %p
+    Lipsum lorem ipsum
+  %p
+    Lipsum lorem ipsum
+  %p
+    Lipsum lorem ipsum
+  %p
+    Lipsum lorem ipsum
+  %p
+    Lipsum lorem ipsum
 
-%p= "Git repo: #{project.git_repo}"
+    
+/%p= "Git repo: #{project.git_repo}"
 
-%ul.actions
-  %li= link_to("Launch me a #{project}", new_project_deploy_path(project))
+/%ul.actions
+/%li
+/= link_to("Launch me a #{project}", new_project_deploy_path(project))
